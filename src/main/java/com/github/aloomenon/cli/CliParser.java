@@ -9,22 +9,17 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import com.github.aloomenon.AppConfiguration;
 import com.github.aloomenon.command.Command;
+import com.github.aloomenon.util.HelpPrinter;
 
 public class CliParser {
 
     private final static Logger LOGGER = Logger.getLogger(CliParser.class);
-
-    private final static String HEADER = "Do something with serial ports" + System.lineSeparator();
-    private final static String FOOTER = System.lineSeparator()
-            + "Please report issues to https://github.com/Aloomenon/SerialPortAccessAdapter";
-    private final static String NAME = "serialPortAdapter";
 
     private final String[] arguments;
 
@@ -88,7 +83,6 @@ public class CliParser {
 
 
     private void printHelp(Options options) {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(NAME, HEADER, options, FOOTER, true);
+        new HelpPrinter(options).print();
     }
 }

@@ -1,8 +1,8 @@
 package com.github.aloomenon.command;
 
 import org.apache.commons.cli.Options;
-import com.github.aloomenon.response.DefaultResponse;
 import com.github.aloomenon.response.Response;
+import com.github.aloomenon.response.StringResponse;
 import com.github.aloomenon.util.HelpPrinter;
 
 public class PrintHelpCommand implements Command {
@@ -16,7 +16,7 @@ public class PrintHelpCommand implements Command {
     @Override
     public Response execute() {
         new HelpPrinter(options).print();
-        return new DefaultResponse();
+        return new StringResponse("OK");
     }
 
 }

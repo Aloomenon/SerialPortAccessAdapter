@@ -15,7 +15,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import com.github.aloomenon.AppConfiguration;
 import com.github.aloomenon.command.Command;
+import com.github.aloomenon.command.ListCommand;
 import com.github.aloomenon.command.PrintHelpCommand;
+import com.github.aloomenon.command.WriteCommand;
 import com.github.aloomenon.util.HelpPrinter;
 
 public class CliParser {
@@ -55,14 +57,14 @@ public class CliParser {
         }
 
         if (line.hasOption(LIST.getOpt())) {
-            // commands.add(new ListCommand());
+            commands.add(new ListCommand());
         }
 
         if (line.hasOption(PORT.getOpt())) {
             port = line.getOptionValue(PORT.getOpt());
 
             if (line.hasOption(WRITE.getOpt())) {
-                // commands.add(new WriteCommand(line.getOptionValue(WRITE.getOpt())));
+                commands.add(new WriteCommand(port, line.getOptionValue(WRITE.getOpt())));
             }
         }
 

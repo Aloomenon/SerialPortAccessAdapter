@@ -5,7 +5,7 @@ import org.apache.commons.cli.Option;
 public enum CliOption {
     HELP("h", "help", false, "Print help"),
     LIST("l", "list", false, "list all available ports"),
-    PORT("p", "port", true, "Port used for I/O operations"),
+    PORT("p", "port", true, "Serial port used for I/O operations"),
     WRITE("w", "write", true, "Commands that will be written to the port");
 
     

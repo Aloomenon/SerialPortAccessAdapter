@@ -2,8 +2,8 @@ package com.github.aloomenon.cli;
 
 import static com.github.aloomenon.cli.CliOption.HELP;
 import static com.github.aloomenon.cli.CliOption.LIST;
-import static com.github.aloomenon.cli.CliOption.WRITE;
 import static com.github.aloomenon.cli.CliOption.PORT;
+import static com.github.aloomenon.cli.CliOption.WRITE;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -15,6 +15,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import com.github.aloomenon.AppConfiguration;
 import com.github.aloomenon.command.Command;
+import com.github.aloomenon.command.PrintHelpCommand;
 import com.github.aloomenon.util.HelpPrinter;
 
 public class CliParser {
@@ -41,26 +42,27 @@ public class CliParser {
         }
     }
 
-    private AppConfiguration parseOptions(Options options, String[] arguments) throws ParseException {
+    private AppConfiguration parseOptions(Options options, String[] arguments)
+            throws ParseException {
         CommandLineParser parser = new DefaultParser();
         List<Command> commands = new ArrayList<>();
         String port = null;
-        
+
         CommandLine line = parser.parse(options, arguments, false);
 
         if (line.hasOption(HELP.getOpt())) {
-           //commands.add(new PrintHelpCommand(() -> printHelp(options)));
+            commands.add(new PrintHelpCommand(options));
         }
-        
+
         if (line.hasOption(LIST.getOpt())) {
-            //commands.add(new ListCommand());
+            // commands.add(new ListCommand());
         }
-        
+
         if (line.hasOption(PORT.getOpt())) {
             port = line.getOptionValue(PORT.getOpt());
-            
+
             if (line.hasOption(WRITE.getOpt())) {
-                //commands.add(new WriteCommand(line.getOptionValue(WRITE.getOpt())));
+                // commands.add(new WriteCommand(line.getOptionValue(WRITE.getOpt())));
             }
         }
 

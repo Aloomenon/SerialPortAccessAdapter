@@ -31,23 +31,34 @@ public class SerialPortAdapter {
     // TODO: move to Command calls.
     public byte[] executeRead() {
         port.openPort();
-        byte[] bytes = read();
-        port.closePort();
+        byte[] bytes;
+        try {
+            bytes = read();
+        } finally {
+            port.closePort();
+        }
 
         return bytes;
     }
 
     public void executeWrite(byte[] data) {
         port.openPort();
-        write(data);
-        port.closePort();
+        try {
+            write(data);
+        } finally {
+            port.closePort();
+        }
     }
 
     public byte[] writeWithResponse(byte[] data) {
+        byte[] response;
         port.openPort();
-        write(data);
-        byte[] response = read();
-        port.closePort();
+        try {
+            write(data);
+            response = read();
+        } finally {
+            port.closePort();
+        }
         return response;
     }
 
@@ -58,9 +69,10 @@ public class SerialPortAdapter {
 
     private void write(byte[] data) {
         LOGGER.info("Start writing to port");
+        port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 0);
         int byteNum = port.writeBytes(data, data.length);
         if (byteNum == -1) {
-            throw new BytesWerentWrittenException();
+            new BytesWerentWrittenException();
         }
         LOGGER.info(byteNum + " bytes were written to port");
     }

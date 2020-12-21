@@ -44,10 +44,10 @@ public class ConverterTest {
     @Test
     public void byteConverterTest() {
         ByteUtf8Converter converter = new ByteUtf8Converter();
-        byte[] actualBytes = converter.toByte(BIN);
-        String actualStr = converter.toString(actualBytes);
+        byte[] actualBytes = converter.convertToByte(BIN);
+        String actualStr = converter.convertToString(actualBytes);
         Assert.assertEquals(BIN, actualStr);
-        Assert.assertArrayEquals(actualBytes, converter.toByte(actualStr));
+        Assert.assertArrayEquals(actualBytes, converter.convertToByte(actualStr));
     }
 
 }

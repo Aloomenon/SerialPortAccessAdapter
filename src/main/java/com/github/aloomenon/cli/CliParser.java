@@ -18,6 +18,7 @@ import com.github.aloomenon.command.Command;
 import com.github.aloomenon.command.ListCommand;
 import com.github.aloomenon.command.PrintHelpCommand;
 import com.github.aloomenon.command.WriteCommand;
+import com.github.aloomenon.serialport.SerialPortAdapter;
 import com.github.aloomenon.util.HelpPrinter;
 
 public class CliParser {
@@ -30,15 +31,14 @@ public class CliParser {
         this.arguments = arguments;
     }
 
-    public AppConfiguration parse() throws ParseException {
+    public AppConfiguration parse() throws Exception {
         Options options = prepareOptions();
         try {
             if (arguments.length == 0) {
                 throw new ParseException("Zero arguments passed.");
             }
             return parseOptions(options, arguments);
-        } catch (ParseException ex) {
-            LOGGER.error(ex);
+        } catch (Exception ex) {
             printHelp(options);
             throw ex;
         }
@@ -63,8 +63,9 @@ public class CliParser {
         if (line.hasOption(PORT.getOpt())) {
             port = line.getOptionValue(PORT.getOpt());
 
+            SerialPortAdapter adapter = new SerialPortAdapter(port);
             if (line.hasOption(WRITE.getOpt())) {
-                commands.add(new WriteCommand(port, line.getOptionValue(WRITE.getOpt())));
+                commands.add(new WriteCommand(adapter, line.getOptionValue(WRITE.getOpt())));
             }
         }
 

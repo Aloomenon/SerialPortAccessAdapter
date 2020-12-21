@@ -72,7 +72,7 @@ public class SerialPortAdapter {
         port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 0);
         int byteNum = port.writeBytes(data, data.length);
         if (byteNum == -1) {
-            new BytesWerentWrittenException();
+            throw new BytesWerentWrittenException();
         }
         LOGGER.info(byteNum + " bytes were written to port");
     }

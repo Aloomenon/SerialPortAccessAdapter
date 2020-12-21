@@ -1,6 +1,7 @@
 package com.github.aloomenon.util;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import com.github.aloomenon.util.converter.BinToHexConverter;
 import com.github.aloomenon.util.converter.Converter;
@@ -17,28 +18,28 @@ public class ConverterTest {
     public void hexToBinTest() {
         Converter hex2bin = new HexToBinConverter(HEX);
         String actual = hex2bin.convert();
-        Assert.assertEquals(BIN, actual);
+        assertEquals(BIN, actual);
     }
 
     @Test
     public void binToHexTest() {
         Converter bin2hex = new BinToHexConverter(BIN);
         String actual = bin2hex.convert();
-        Assert.assertEquals(HEX, actual);
+        assertEquals(HEX, actual);
     }
 
     @Test
     public void hexToBinNullTest() {
         Converter hex2bin = new HexToBinConverter(null);
         String actual = hex2bin.convert();
-        Assert.assertEquals(EMPTY, actual);
+        assertEquals(EMPTY, actual);
     }
 
     @Test
     public void binToHexNullTest() {
         Converter bin2hex = new BinToHexConverter(null);
         String actual = bin2hex.convert();
-        Assert.assertEquals(EMPTY, actual);
+        assertEquals(EMPTY, actual);
     }
 
     @Test
@@ -46,8 +47,8 @@ public class ConverterTest {
         ByteUtf8Converter converter = new ByteUtf8Converter();
         byte[] actualBytes = converter.convertToByte(BIN);
         String actualStr = converter.convertToString(actualBytes);
-        Assert.assertEquals(BIN, actualStr);
-        Assert.assertArrayEquals(actualBytes, converter.convertToByte(actualStr));
+        assertEquals(BIN, actualStr);
+        assertArrayEquals(actualBytes, converter.convertToByte(actualStr));
     }
 
 }

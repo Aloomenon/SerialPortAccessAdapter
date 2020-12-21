@@ -1,7 +1,6 @@
 package com.github.aloomenon.command;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.apache.log4j.Logger;
 import com.fazecast.jSerialComm.SerialPort;
@@ -10,6 +9,9 @@ import com.github.aloomenon.exception.BytesWerentWrittenException;
 import com.github.aloomenon.exception.NullPortException;
 import com.github.aloomenon.response.Response;
 import com.github.aloomenon.response.StringResponse;
+import com.github.aloomenon.util.ByteUtf8Converter;
+import com.github.aloomenon.util.converter.BinToHexConverter;
+import com.github.aloomenon.util.converter.HexToBinConverter;
 
 public class WriteCommand implements Command {
 
@@ -29,15 +31,19 @@ public class WriteCommand implements Command {
     public Response execute() {
         Optional.ofNullable(port).orElseThrow(
                 () -> new NullPortException("You cannot write without specifying a port. Use -p"));
+
+        ByteUtf8Converter byteConverter = new ByteUtf8Converter();
+
         SerialPort commPort = SerialPort.getCommPort(port);
         commPort.openPort();
 
-        byte[] buffer = hexToBin(command);
+        byte[] buffer = byteConverter.toByte(new HexToBinConverter(command).convert());
         int byteNum = commPort.writeBytes(buffer, buffer.length);
         if (byteNum == -1) {
             throw new BytesWerentWrittenException();
         }
 
+        // TODO: Move to ReadCommand
         commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -55,32 +61,8 @@ public class WriteCommand implements Command {
         }
 
         commPort.closePort();
-        return new StringResponse(binToHex(baos.toByteArray()));
-    }
-
-    private byte[] hexToBin(String command) {
-        LOGGER.info(String.format("Start converting '%s' to binary", command));
-        char[] chars = command.toCharArray();
-        StringBuilder hex = new StringBuilder();
-        for (char ch : chars) {
-            hex.append(Integer.toHexString((int) ch));
-        }
-        String hexString = hex.toString();
-        byte[] binary = hexString.getBytes(StandardCharsets.UTF_8);
-        LOGGER.info(String.format("Hex presentation: '%s' -> to binary '%s'", hexString, binary));
-        return binary;
-    }
-
-    private String binToHex(byte[] arr) {
-        String hexStr = new String(arr, StandardCharsets.UTF_8);
-        StringBuilder output = new StringBuilder("");
-
-        for (int i = 0; i < hexStr.length(); i += 2) {
-            String str = hexStr.substring(i, i + 2);
-            output.append((char) Integer.parseInt(str, 16));
-        }
-
-        return output.toString();
+        return new StringResponse(
+                new BinToHexConverter(byteConverter.toString(baos.toByteArray())).convert());
     }
 
 }

@@ -24,7 +24,7 @@ public class SerialPortAdapter {
     }
 
     public static List<String> getCommPorts() {
-        return Arrays.stream(SerialPort.getCommPorts()).map(SerialPort::getPortDescription)
+        return Arrays.stream(SerialPort.getCommPorts()).map(SerialPort::getDescriptivePortName)
                 .collect(Collectors.toList());
     }
 

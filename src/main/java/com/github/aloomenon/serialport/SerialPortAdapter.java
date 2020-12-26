@@ -15,7 +15,7 @@ public class SerialPortAdapter {
 
     private static final Logger LOGGER = Logger.getLogger(SerialPortAdapter.class);
 
-    private static final int TIMEOUT_MS = 5000;
+    private static final int TIMEOUT_MS = 500;
 
     private final SerialPort port;
 
@@ -24,7 +24,8 @@ public class SerialPortAdapter {
     }
 
     public static List<String> getCommPorts() {
-        return Arrays.stream(SerialPort.getCommPorts()).map(SerialPort::getDescriptivePortName)
+        return Arrays.stream(SerialPort.getCommPorts())
+        		.map(SerialPort::getSystemPortName)
                 .collect(Collectors.toList());
     }
 
@@ -51,14 +52,21 @@ public class SerialPortAdapter {
     }
 
     public byte[] writeWithResponse(byte[] data) {
-        byte[] response;
         port.openPort();
+
+        if (!port.isOpen()) {
+            throw new RuntimeException("HUEVO");
+        }
+        byte[] response;
+        // TODO: to init port. + make it configurable.
+        port.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
         try {
             write(data);
             response = read();
         } finally {
             port.closePort();
         }
+
         return response;
     }
 
@@ -69,7 +77,6 @@ public class SerialPortAdapter {
 
     private void write(byte[] data) {
         LOGGER.info("Start writing to port");
-        port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 0);
         int byteNum = port.writeBytes(data, data.length);
         if (byteNum == -1) {
             throw new BytesWerentWrittenException();
@@ -78,24 +85,31 @@ public class SerialPortAdapter {
     }
 
     private byte[] read() {
-        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        LOGGER.info("Start reading from port");
+        LOGGER.info("Start reading from port " + port.getSystemPortName());
         try {
             long start = System.currentTimeMillis();
             while (start + TIMEOUT_MS >= System.currentTimeMillis()) {
-                byte[] readBuffer = new byte[1024];
+                if (port.bytesAvailable() <= 0) {
+                    continue;
+                }
+                byte[] readBuffer = new byte[port.bytesAvailable()];
                 int numRead = port.readBytes(readBuffer, readBuffer.length);
                 if (numRead == -1) {
                     throw new BytesWerentReadException();
                 }
-                LOGGER.info(numRead + " bytes were read");
-                baos.write(readBuffer);
+                LOGGER.info(String.format("%s bytes were read from %s", numRead,
+                        port.getSystemPortName()));
+                if (numRead > 0) {
+                    start = System.currentTimeMillis();
+                    baos.write(readBuffer);
+                }
             }
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error occured while reading", e);
         }
-        LOGGER.info("Finish reading from port");
-        return baos.toByteArray();
+        byte[] result = baos.toByteArray();
+        LOGGER.info(String.format("Finish reading from port. %s bytes were read.", result.length));
+        return result;
     }
 }

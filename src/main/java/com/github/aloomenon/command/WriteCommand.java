@@ -1,12 +1,11 @@
 package com.github.aloomenon.command;
 
+import java.util.Arrays;
+import javax.xml.bind.DatatypeConverter;
 import org.apache.log4j.Logger;
 import com.github.aloomenon.response.Response;
 import com.github.aloomenon.response.StringResponse;
 import com.github.aloomenon.serialport.SerialPortAdapter;
-import com.github.aloomenon.util.ByteUtf8Converter;
-import com.github.aloomenon.util.converter.BinToHexConverter;
-import com.github.aloomenon.util.converter.HexToBinConverter;
 
 public class WriteCommand implements Command {
 
@@ -23,12 +22,11 @@ public class WriteCommand implements Command {
     @Override
     public Response execute() {
         LOGGER.info("execute Write command");
-        ByteUtf8Converter byteConverter = new ByteUtf8Converter();
-
-        byte[] buffer = byteConverter.convertToByte(new HexToBinConverter(command).convert());
+        byte[] buffer = DatatypeConverter.parseHexBinary(command);
+        LOGGER.info("converted buffer:" + Arrays.toString(buffer));
         byte[] response = adapter.writeWithResponse(buffer);
-        String hex = new BinToHexConverter(byteConverter.convertToString(response)).convert();
-        LOGGER.info("Write response: " + hex);
+        String hex = DatatypeConverter.printHexBinary(response);
+        LOGGER.info("Write command complited");
         return new StringResponse(hex);
     }
 

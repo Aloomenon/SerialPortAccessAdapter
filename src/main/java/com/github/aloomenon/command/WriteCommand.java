@@ -11,12 +11,20 @@ public class WriteCommand implements Command {
 
     private static final Logger LOGGER = Logger.getLogger(WriteCommand.class);
 
+    private static final int TIMEOUT_MS = 500;
+
     private final SerialPortAdapter adapter;
     private final String command;
+    private final Integer timeout;
 
     public WriteCommand(SerialPortAdapter adapter, String command) {
+        this(adapter, command, TIMEOUT_MS);
+    }
+
+    public WriteCommand(SerialPortAdapter adapter, String command, Integer timeout) {
         this.adapter = adapter;
         this.command = command;
+        this.timeout = timeout;
     }
 
     @Override
@@ -24,7 +32,7 @@ public class WriteCommand implements Command {
         LOGGER.info("execute Write command");
         byte[] buffer = DatatypeConverter.parseHexBinary(command);
         LOGGER.info("converted buffer:" + Arrays.toString(buffer));
-        byte[] response = adapter.writeWithResponse(buffer);
+        byte[] response = adapter.writeWithResponse(buffer, timeout);
         String hex = DatatypeConverter.printHexBinary(response);
         LOGGER.info("Write command complited");
         return new StringResponse(hex);

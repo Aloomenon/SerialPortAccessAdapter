@@ -15,8 +15,6 @@ public class SerialPortAdapter {
 
     private static final Logger LOGGER = Logger.getLogger(SerialPortAdapter.class);
 
-    private static final int TIMEOUT_MS = 500;
-
     private final SerialPort port;
 
     public SerialPortAdapter(String descriptor) {
@@ -24,8 +22,7 @@ public class SerialPortAdapter {
     }
 
     public static List<String> getCommPorts() {
-        return Arrays.stream(SerialPort.getCommPorts())
-        		.map(SerialPort::getSystemPortName)
+        return Arrays.stream(SerialPort.getCommPorts()).map(SerialPort::getSystemPortName)
                 .collect(Collectors.toList());
     }
 
@@ -34,7 +31,7 @@ public class SerialPortAdapter {
         port.openPort();
         byte[] bytes;
         try {
-            bytes = read();
+            bytes = read(500);
         } finally {
             port.closePort();
         }
@@ -51,7 +48,7 @@ public class SerialPortAdapter {
         }
     }
 
-    public byte[] writeWithResponse(byte[] data) {
+    public byte[] writeWithResponse(byte[] data, int timeout) {
         port.openPort();
 
         if (!port.isOpen()) {
@@ -62,7 +59,7 @@ public class SerialPortAdapter {
         port.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
         try {
             write(data);
-            response = read();
+            response = read(timeout);
         } finally {
             port.closePort();
         }
@@ -84,12 +81,12 @@ public class SerialPortAdapter {
         LOGGER.info(byteNum + " bytes were written to port");
     }
 
-    private byte[] read() {
+    private byte[] read(int timeout) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         LOGGER.info("Start reading from port " + port.getSystemPortName());
         try {
             long start = System.currentTimeMillis();
-            while (start + TIMEOUT_MS >= System.currentTimeMillis()) {
+            while (start + timeout >= System.currentTimeMillis()) {
                 if (port.bytesAvailable() <= 0) {
                     continue;
                 }

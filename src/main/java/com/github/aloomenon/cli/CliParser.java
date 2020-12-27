@@ -3,6 +3,7 @@ package com.github.aloomenon.cli;
 import static com.github.aloomenon.cli.CliOption.HELP;
 import static com.github.aloomenon.cli.CliOption.LIST;
 import static com.github.aloomenon.cli.CliOption.PORT;
+import static com.github.aloomenon.cli.CliOption.RESPONSE_TIMEOUT;
 import static com.github.aloomenon.cli.CliOption.WRITE;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,9 @@ public class CliParser {
 
             SerialPortAdapter adapter = new SerialPortAdapter(port);
             if (line.hasOption(WRITE.getOpt())) {
-                commands.add(new WriteCommand(adapter, line.getOptionValue(WRITE.getOpt())));
+                Integer timeout = Integer.parseInt(line.getOptionValue(RESPONSE_TIMEOUT.getOpt()));
+                commands.add(
+                        new WriteCommand(adapter, line.getOptionValue(WRITE.getOpt()), timeout));
             }
         }
 
@@ -81,6 +84,7 @@ public class CliParser {
         options.addOptionGroup(group);
 
         options.addOption(WRITE.getBuilder().hasArgs().argName("Commands").build());
+        options.addOption(RESPONSE_TIMEOUT.getBuilder().argName("timeout").build());
 
         options.addOption(HELP.build());
         return options;

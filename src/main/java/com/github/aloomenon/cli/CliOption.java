@@ -6,7 +6,8 @@ public enum CliOption {
     HELP("h", "help", false, "Print help"),
     LIST("l", "list", false, "list all available ports"),
     PORT("p", "port", true, "Serial port used for I/O operations"),
-    WRITE("w", "write", true, "Commands that will be written to the port");
+    WRITE("w", "write", true, "Commands that will be written to the port"),
+    RESPONSE_TIMEOUT("t", "timeout", true, "How much will wait for response");
 
     
     private final String opt;

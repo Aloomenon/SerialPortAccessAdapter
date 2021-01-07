@@ -51,12 +51,8 @@ public class SerialPortAdapter {
     public byte[] writeWithResponse(byte[] data, int timeout) {
         port.openPort();
 
-        if (!port.isOpen()) {
-            throw new RuntimeException("HUEVO");
-        }
+        setParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
         byte[] response;
-        // TODO: to init port. + make it configurable.
-        port.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
         try {
             write(data);
             response = read(timeout);
@@ -70,6 +66,13 @@ public class SerialPortAdapter {
     protected SerialPort getSerialPort(String handle) {
         return SerialPort.getCommPort(Optional.ofNullable(handle).orElseThrow(
                 () -> new NullPortException("You cannot write without specifying a port. Use -p")));
+    }
+
+    private void setParameters(int baudRate, int dataBits, int stopBit, int parity) {
+        if (!port.isOpen()) {
+            throw new RuntimeException("Port didn't open");
+        }
+        port.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
     }
 
     private void write(byte[] data) {

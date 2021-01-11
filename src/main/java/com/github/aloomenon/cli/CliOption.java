@@ -7,7 +7,8 @@ public enum CliOption {
     LIST("l", "list", false, "list all available ports"),
     PORT("p", "port", true, "Serial port used for I/O operations"),
     WRITE("w", "write", true, "Commands that will be written to the port"),
-    RESPONSE_TIMEOUT("t", "timeout", true, "How much will wait for response");
+    RESPONSE_TIMEOUT("t", "timeout", true, "How much will wait for response"),
+    DEBUG("d", "debug", false, "Debug logging mode");
 
     
     private final String opt;
